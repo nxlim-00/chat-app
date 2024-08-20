@@ -6,6 +6,8 @@ import {
   StyleSheet,
   ImageBackground,
   TouchableOpacity,
+  KeyboardAvoidingView,
+  Platform,
 } from 'react-native';
 
 const Start = ({ navigation }) => {
@@ -22,7 +24,6 @@ const Start = ({ navigation }) => {
       <View style={{ flex: 1 }}>
         <Text style={styles.title}>Chat App</Text>
       </View>
-
       <View style={styles.inputContainer}>
         <View style={styles.inputWrapper}>
           {/* <Image
@@ -41,7 +42,12 @@ const Start = ({ navigation }) => {
           <Text style={styles.chooseColorText}>Choose a Background Color:</Text>
           <View style={styles.colorContainer}>
             {backgroundColorList.map((color, index) => (
+              /*  added accessibility  */
               <TouchableOpacity
+                accessible={true}
+                accessibilityLabel="More options"
+                accessibilityHint="Lets you choose to send an image or your geolocation."
+                accessibilityRole="button"
                 key={index}
                 style={[
                   styles.colorOption,
@@ -56,6 +62,7 @@ const Start = ({ navigation }) => {
             ))}
           </View>
         </View>
+
         <TouchableOpacity
           onPress={() => navigation.navigate('Chat', { name, backgroundColor })}
           style={styles.startButton}
@@ -63,6 +70,16 @@ const Start = ({ navigation }) => {
           <Text style={styles.startButtonText}>Start Chatting</Text>
         </TouchableOpacity>
       </View>
+
+      {/* KeyboardAvoidingView for Android so it's not hidden while typing */}
+      {Platform.OS === 'android' ? (
+        <KeyboardAvoidingView behavior="height" />
+      ) : null}
+
+      {/* KeyboardAvoidingView for iOS so it's not hidden while typing */}
+      {Platform.OS === 'ios' ? (
+        <KeyboardAvoidingView behavior="padding" />
+      ) : null}
     </ImageBackground>
   );
 };
@@ -82,10 +99,10 @@ const styles = StyleSheet.create({
   },
   inputContainer: {
     flex: 1,
-    width: '90%',
+    width: '88%',
     padding: 10,
     marginBottom: 40,
-    height: '40%',
+    height: '44%',
     justifyContent: 'center',
     alignItems: 'center',
     backgroundColor: 'white',
@@ -118,7 +135,7 @@ const styles = StyleSheet.create({
     color: '#757083',
   },
   chooseColorText: {
-    color: '#757083',
+    color: '#000',
     fontSize: 16,
     marginBottom: 20,
     fontWeight: '300',
@@ -133,6 +150,7 @@ const styles = StyleSheet.create({
     height: 50,
     borderRadius: 25,
     marginRight: 10,
+    marginLeft: 10,
   },
   startButton: {
     width: '88%',
