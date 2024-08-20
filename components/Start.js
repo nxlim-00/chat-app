@@ -16,7 +16,7 @@ const Start = ({ navigation }) => {
 
   return (
     <ImageBackground
-      source={require('../img/Background Image.png')}
+      source={require('../assets/Background Image.png')}
       style={[styles.container, { backgroundColor: backgroundColor }]} // Apply the selected background color
     >
       <View style={{ flex: 1 }}>
