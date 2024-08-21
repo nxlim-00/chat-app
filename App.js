@@ -1,4 +1,4 @@
-import { StyleSheet, Text, View } from 'react-native';
+import { StyleSheet } from 'react-native';
 
 // import the screens
 import Start from './components/Start';
@@ -13,8 +13,15 @@ const Stack = createNativeStackNavigator();
 
 // Import the functions you need from the SDKs you need
 import { initializeApp } from 'firebase/app';
-import { getFirestore } from 'firebase/firestore';
-import { LogBox } from 'react-native';
+import {
+  getFirestore,
+  disableNetwork,
+  enableNetwork,
+} from 'firebase/firestore';
+
+import { useEffect } from 'react';
+import { LogBox, Alert } from 'react-native';
+import { useNetInfo } from '@react-native-community/netinfo';
 LogBox.ignoreLogs(['AsyncStorage has been extracted from']);
 
 const App = () => {
@@ -34,12 +41,29 @@ const App = () => {
   // Initialize Cloud Firestore and get a reference to the service
   const db = getFirestore(app);
 
+  const connectionStatus = useNetInfo();
+
+  useEffect(() => {
+    if (connectionStatus.isConnected === false) {
+      Alert.alert('Connection Lost!');
+      disableNetwork(db);
+    } else if (connectionStatus.isConnected === true) {
+      enableNetwork(db);
+    }
+  }, [connectionStatus.isConnected]);
+
   return (
     <NavigationContainer>
       <Stack.Navigator initialRouteName="Start">
         <Stack.Screen name="Start" component={Start} />
         <Stack.Screen name="Chat">
-          {(props) => <Chat {...props} db={db} />}
+          {(props) => (
+            <Chat
+              isConnected={connectionStatus.isConnected}
+              db={db}
+              {...props}
+            />
+          )}
         </Stack.Screen>
       </Stack.Navigator>
     </NavigationContainer>
