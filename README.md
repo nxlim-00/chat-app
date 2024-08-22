@@ -31,6 +31,30 @@ ChatApp is a real-time messaging application built with React Native, Firebase, 
 - [Node.js](https://nodejs.org/) (v14 or later)
 - [Expo CLI](https://docs.expo.dev/get-started/installation/)
 - [Firebase Project](https://firebase.google.com/)
+- [Android Studio](https://developer.android.com/studio) (for Android emulator)
+
+### Clone the Repository
+
+```bash
+git clone https://github.com/yourusername/chatapp.git
+cd chatapp
+```
+
+### Install Dependencies
+
+```bash
+npm install
+```
+
+### Setting Up an Android Emulator
+
+1. **Install and Set Up Android Studio:**
+   - Download and install Android Studio from the [official website](https://developer.android.com/studio).
+   - Click on **Create Virtual Device** and choose a device model (e.g., Pixel 4).
+   - Finish the setup by following the on-screen instructions and start the emulator.
+
+2. **Run the App on the Emulator:**
+   - In the project directory, run `npm start` and press `a` to open the app in the Android emulator.
 
 ### Clone the Repository
 
