@@ -9,8 +9,11 @@ import {
   addDoc,
 } from 'firebase/firestore';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import CustomActions from './CustomActions';
+import MapView from 'react-native-maps';
+import { ActionSheetProvider } from '@expo/react-native-action-sheet';
 
-const Chat = ({ route, navigation, db, isConnected }) => {
+const Chat = ({ route, navigation, db, isConnected, storage }) => {
   const { userID } = route.params;
   const { name, backgroundColor } = route.params;
   const [messages, setMessages] = useState([]);
@@ -64,11 +67,14 @@ const Chat = ({ route, navigation, db, isConnected }) => {
     });
     // check if user is connected to internet
     if (isConnected === true) {
+      if (unsubMessages) unsubMessages();
+      unsubMessages = null;
+
       const q = query(collection(db, 'messages'), orderBy('createdAt', 'desc'));
 
       // Subscribe to changes in the "messages" collection using onSnapshot
       // This function will be called whenever there are changes in the collection
-      const unsubMessages = onSnapshot(q, async (documentsSnapshot) => {
+      unsubMessages = onSnapshot(q, async (documentsSnapshot) => {
         // Initialize an empty array to store the new messages
         let newMessages = [];
         // Iterate through each document in the snapshot
@@ -87,7 +93,6 @@ const Chat = ({ route, navigation, db, isConnected }) => {
     // Clean up code
     return () => {
       if (unsubMessages) unsubMessages();
-      unsubMessages = null;
     };
   }, [isConnected]);
 
@@ -104,19 +109,44 @@ const Chat = ({ route, navigation, db, isConnected }) => {
     }
   };
 
+  const renderCustomActions = (props) => {
+    return <CustomActions onSend={onSend} storage={storage} {...props} />;
+  };
+
+  const renderCustomView = (props) => {
+    const { currentMessage } = props;
+    if (currentMessage.location) {
+      return (
+        <MapView
+          style={{ width: 150, height: 100, borderRadius: 13, margin: 3 }}
+          region={{
+            latitude: currentMessage.location.latitude,
+            longitude: currentMessage.location.longitude,
+            latitudeDelta: 0.0922,
+            longitudeDelta: 0.0421,
+          }}
+        />
+      );
+    }
+    return null;
+  };
+
   return (
     <View style={[styles.container, { backgroundColor: backgroundColor }]}>
-      <GiftedChat
-        messages={messages}
-        renderBubble={renderBubble}
-        renderInputToolbar={renderInputToolbar}
-        onSend={(messages) => onSend(messages)}
-        user={{
-          _id: userID,
-          name: name,
-        }}
-      />
-
+      <ActionSheetProvider>
+        <GiftedChat
+          messages={messages}
+          renderBubble={renderBubble}
+          renderActions={renderCustomActions}
+          renderCustomView={renderCustomView}
+          renderInputToolbar={renderInputToolbar}
+          onSend={(messages) => onSend(messages)}
+          user={{
+            _id: userID,
+            name: name,
+          }}
+        />
+      </ActionSheetProvider>
       {Platform.OS === 'android' ? (
         <KeyboardAvoidingView behavior="height" />
       ) : null}
